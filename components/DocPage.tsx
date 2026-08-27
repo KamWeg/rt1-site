@@ -1,6 +1,7 @@
 import { Container } from './ui'
 import { Nav } from './Nav'
 import { Footer } from './Footer'
+import { SplitLines } from './SplitLines'
 import type { Doc } from '@/lib/legal'
 
 /**
@@ -16,9 +17,11 @@ export function DocPage({ doc }: { doc: Doc }) {
           <article className="py-20 sm:py-28">
             <header className="border-b border-border pb-12">
               <p className="micro-s text-muted">Updated {doc.updated}</p>
-              <h1 className="font-serif-display text-h2 mt-6 max-w-[16ch] leading-[1.08] tracking-[-0.015em] text-ink">
-                {doc.title}
-              </h1>
+              <SplitLines
+                as="h1"
+                text={doc.title}
+                className="font-serif-display text-h2 mt-6 max-w-[16ch] leading-[1.08] tracking-[-0.015em] text-ink"
+              />
               <p className="measure text-lead mt-6 leading-[1.55] text-muted">{doc.intro}</p>
             </header>
 

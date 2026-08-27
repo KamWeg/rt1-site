@@ -31,21 +31,24 @@ export default function Home() {
         <section className="px-0 pb-20 pt-10 sm:pb-28 sm:pt-14 lg:flex lg:min-h-[calc(100svh-4rem)] lg:items-center lg:py-8">
           <Container>
             <div className="grid items-center gap-14 lg:grid-cols-[1fr_minmax(280px,360px)] lg:gap-16">
-              <div data-reveal>
+              <div className="intro">
                 <p className="micro-s text-muted">{hero.eyebrow}</p>
 
-                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-4 gap-y-2">
-                  <span className="font-serif-display text-logo leading-[0.86] tracking-[-0.03em] text-ink">
-                    {site.name}
+                <h1 className="mt-6">
+                  <span className="rise-mask">
+                    <span className="font-serif-display text-logo leading-[0.86] tracking-[-0.03em] text-ink">
+                      {site.name}
+                    </span>
                   </span>
                   <span className="sr-only">— {site.tagline}</span>
                 </h1>
 
-                <p
-                  aria-hidden="true"
-                  className="font-serif-display text-display mt-4 leading-[1.02] tracking-[-0.02em] text-ink"
-                >
-                  {site.tagline}
+                <p aria-hidden="true" className="mt-4">
+                  <span className="rise-mask">
+                    <span className="font-serif-display text-display leading-[1.02] tracking-[-0.02em] text-ink">
+                      {site.tagline}
+                    </span>
+                  </span>
                 </p>
 
                 <p className="measure text-lead mt-7 leading-[1.55] text-muted">{hero.lede}</p>
@@ -65,7 +68,7 @@ export default function Home() {
                 <p className="micro-s mt-5 text-muted">{hero.status.note}</p>
               </div>
 
-              <div data-reveal className="remote-fit lg:pl-4">
+              <div className="intro-late remote-fit lg:pl-4">
                 <Remote idleLabel={hero.idle} />
               </div>
             </div>
@@ -83,10 +86,11 @@ export default function Home() {
             />
 
             <ol className="mt-16 grid border-t border-border md:grid-cols-3">
-              {howItWorks.steps.map((step) => (
+              {howItWorks.steps.map((step, i) => (
                 <li
                   key={step.index}
                   data-reveal
+                  style={{ '--reveal-delay': `${i * 90}ms` } as React.CSSProperties}
                   className="border-b border-border py-10 md:border-b-0 md:border-r md:px-8 md:py-12 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
                 >
                   <span className="micro-s text-muted">{step.index}</span>
@@ -114,8 +118,12 @@ export default function Home() {
             />
 
             <ul className="mt-16 grid gap-px border-t border-white/12 sm:grid-cols-2">
-              {privacy.points.map((point) => (
-                <li key={point.numeral} data-reveal className="border-b border-white/12 py-10 sm:px-8 sm:first:pl-0 sm:[&:nth-child(2n+1)]:pl-0 sm:[&:nth-child(2n)]:pr-0">
+              {privacy.points.map((point, i) => (
+                <li
+                  key={point.numeral}
+                  data-reveal
+                  style={{ '--reveal-delay': `${i * 90}ms` } as React.CSSProperties}
+                  className="border-b border-white/12 py-10 sm:px-8 sm:first:pl-0 sm:[&:nth-child(2n+1)]:pl-0 sm:[&:nth-child(2n)]:pr-0">
                   <div className="flex items-baseline gap-4">
                     {/* Accent 3 of 3 — the numerals, as on the channel display */}
                     <span className="font-serif-display text-numeral leading-none tracking-[-0.01em] text-accent">

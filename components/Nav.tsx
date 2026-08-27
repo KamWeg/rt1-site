@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Container } from './ui'
+import { ScrollProgress } from './ScrollProgress'
 import { nav, site } from '@/lib/content'
 
 /**
@@ -10,6 +11,7 @@ import { nav, site } from '@/lib/content'
 export function Nav() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg">
+      <ScrollProgress />
       <Container>
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-baseline gap-2" aria-label={`${site.name} home`}>

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { SplitLines } from './SplitLines'
 
 /**
  * Layout primitives. Every section on the page is built from these three,
@@ -63,12 +64,14 @@ export function SectionHead({
     <div data-reveal>
       <div className={`flex items-center gap-3 ${muted}`}>
         <span className="micro-s">{index}</span>
-        <span className="h-px w-6 bg-current opacity-40" aria-hidden="true" />
+        <span className="rule h-px w-6 bg-current opacity-40" aria-hidden="true" />
         <span className="micro-s">{label}</span>
       </div>
-      <Heading className={`font-serif-display text-h2 mt-6 max-w-[24ch] text-balance leading-[1.08] tracking-[-0.015em] ${ink}`}>
-        {heading}
-      </Heading>
+      <SplitLines
+        as={Heading}
+        text={heading}
+        className={`font-serif-display text-h2 mt-6 max-w-[24ch] text-balance leading-[1.08] tracking-[-0.015em] ${ink}`}
+      />
       {lede ? (
         <p className={`measure text-lead mt-6 leading-[1.55] ${muted}`}>{lede}</p>
       ) : null}
