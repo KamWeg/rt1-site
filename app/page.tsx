@@ -106,10 +106,13 @@ export default function Home() {
         <section
           id="privacy"
           data-reveal
-          className="crt on-dark bg-dark py-section text-on-dark"
+          className="crt on-dark py-section text-on-dark"
           style={{ scrollMarginTop: '5rem' }}
         >
-          <Container>
+          {/* The dark block is a layer of its own so the clip that opens it
+              never touches the element the observer is watching. */}
+          <span className="crt-screen" aria-hidden="true" />
+          <Container className="relative z-[1]">
             <SectionHead
               index={privacy.index}
               label={privacy.label}
@@ -118,12 +121,15 @@ export default function Home() {
               tone="dark"
             />
 
-            <ul className="mt-16 grid gap-px border-t border-white/12 sm:grid-cols-2">
+            <ul
+              className="mt-16 grid gap-px border-t border-white/12 sm:grid-cols-2"
+              style={{ '--reveal-delay': '260ms' } as React.CSSProperties}
+            >
               {privacy.points.map((point, i) => (
                 <li
                   key={point.numeral}
                   data-reveal
-                  style={{ '--reveal-delay': `${i * 90}ms` } as React.CSSProperties}
+                  style={{ '--reveal-delay': `${260 + i * 90}ms` } as React.CSSProperties}
                   className="border-b border-white/12 py-10 sm:px-8 sm:first:pl-0 sm:[&:nth-child(2n+1)]:pl-0 sm:[&:nth-child(2n)]:pr-0">
                   <div className="flex items-baseline gap-4">
                     {/* Accent 3 of 3 — the numerals, as on the channel display */}

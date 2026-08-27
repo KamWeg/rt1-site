@@ -101,14 +101,24 @@ export function SplitLines({
     let revealed = false
     let width = host.getBoundingClientRect().width
 
+    // Only a heading that is still below the fold is worth hiding. One that
+    // is already on screen has nothing to rise into view from, and hiding it
+    // to wait for an observer is how a heading ends up never appearing.
+    const belowFold = host.getBoundingClientRect().top > window.innerHeight * 0.9
+
     const split = () => {
       const inners = buildMasks(host, measureLines(host, text))
-      if (revealed) return
+      if (revealed || !belowFold) return inners
       for (const inner of inners) inner.style.transform = 'translateY(110%)'
       return inners
     }
 
     let inners = split() ?? []
+
+    if (!belowFold) {
+      // Already in view: the lines are built, but nothing is hidden.
+      revealed = true
+    }
 
     const reveal = () => {
       if (revealed) return
@@ -134,7 +144,15 @@ export function SplitLines({
       },
       { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
     )
-    observer.observe(host)
+    if (!revealed) observer.observe(host)
+
+    /**
+     * A deadline, because the cost of this animation failing is a heading
+     * that never appears. Observers can be starved — a background tab stops
+     * delivering them entirely — and no animation is worth losing the words
+     * over. Whatever happens, the heading is readable within four seconds.
+     */
+    const failsafe = setTimeout(reveal, 4000)
 
     // Line breaks move when the column does, so the split is redone on a
     // width change — and only on a width change, since a height change
@@ -150,6 +168,7 @@ export function SplitLines({
     resize.observe(host)
 
     return () => {
+      clearTimeout(failsafe)
       observer.disconnect()
       resize.disconnect()
       host.textContent = text

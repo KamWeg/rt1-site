@@ -259,15 +259,30 @@ body {
    only place the argument is about a screen, so it is the only place this
    belongs.
 
-   Armed it is clipped to a 2px band; unclipped is the resting state, so
-   with no JavaScript the panel is simply there. */
+   The clip is on a background layer, never on the section itself. An
+   IntersectionObserver measures the *clipped* box, so clipping the element
+   being observed holds its visible area at two pixels — below any sensible
+   threshold — and the observer that was meant to open it never fires. The
+   panel stayed shut for exactly that reason.
+
+   Unclipped is the resting state, so with no JavaScript the panel is
+   simply there. */
+.crt { position: relative; }
+.crt > .crt-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-dark);
+}
 [data-reveal].crt.reveal-armed {
   opacity: 1;
   transform: none;
+}
+[data-reveal].crt.reveal-armed > .crt-screen {
   clip-path: inset(calc(50% - 1px) 0 calc(50% - 1px) 0);
   transition: clip-path 820ms var(--ease-out-expo);
 }
-[data-reveal].crt.reveal-in {
+[data-reveal].crt.reveal-in > .crt-screen {
   clip-path: inset(0 0 0 0);
 }
 
@@ -300,7 +315,7 @@ details[open] .answer {
     transform: none !important;
     transition: none !important;
   }
-  [data-reveal].crt.reveal-armed {
+  [data-reveal].crt.reveal-armed > .crt-screen {
     clip-path: none !important;
     transition: none !important;
   }

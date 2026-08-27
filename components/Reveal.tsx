@@ -40,7 +40,21 @@ export function Reveal() {
     )
 
     offscreen.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
+
+    /**
+     * The same deadline SplitLines carries, for the same reason: an armed
+     * element is invisible until something reveals it, and an observer that
+     * never delivers would take whole sections of the page with it. After
+     * four seconds everything still hidden is shown, animation or not.
+     */
+    const failsafe = setTimeout(() => {
+      for (const el of offscreen) el.classList.add('reveal-in')
+    }, 4000)
+
+    return () => {
+      clearTimeout(failsafe)
+      observer.disconnect()
+    }
   }, [])
 
   return null
