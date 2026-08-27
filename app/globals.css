@@ -326,6 +326,38 @@ details[open] .answer {
   details[open] .answer { animation: none !important; }
 }
 
+/* One ring leaves the dial's centre as the hero settles and is gone — the
+   gesture from the app's scan screen, where the product's story starts.
+   It runs once, on load, and is never repeated: a pulse that keeps beating
+   stops being a signal and becomes wallpaper.
+
+   Sized to the dial so the scale factors read against a known circle, and
+   drawn behind the keys because it comes from under them. */
+@keyframes signal-out {
+  0%   { transform: translate(-50%, -50%) scale(0.06); opacity: 0; }
+  10%  { opacity: 0.34; }
+  100% { transform: translate(-50%, -50%) scale(1.45); opacity: 0; }
+}
+
+.signal-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  width: 300em;
+  height: 300em;
+  border: 1px solid var(--color-glyph);
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.06);
+  animation: signal-out 1800ms var(--ease-out-expo) 1000ms 1 both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-ring { animation: none !important; opacity: 0 !important; }
+}
+
 /* ── Keys ─────────────────────────────────────────────────────────────── */
 
 /* Press feedback lives in components/Remote.tsx, because it needs the touch
