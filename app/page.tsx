@@ -105,7 +105,8 @@ export default function Home() {
         {/* ── /02 Privacy — the page's only dark panel ───────────────── */}
         <section
           id="privacy"
-          className="on-dark bg-dark py-section text-on-dark"
+          data-reveal
+          className="crt on-dark bg-dark py-section text-on-dark"
           style={{ scrollMarginTop: '5rem' }}
         >
           <Container>

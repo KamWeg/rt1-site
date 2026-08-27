@@ -486,6 +486,12 @@ const ARROW_VECTOR: Record<Direction, { x: number; y: number }> = {
 
 /** Degrees the whole dial tips towards whichever arrow is held. */
 const DIAL_TILT = 5
+/**
+ * Degrees it leans towards a pointer that is merely over it. Half the press
+ * tilt, so anticipating a press never reads as loudly as making one — and
+ * only on devices that have a pointer to hover with.
+ */
+const DIAL_LEAN = 2.4
 
 /**
  * The directional dial.
@@ -504,24 +510,51 @@ function Dial({
   onArrow: (direction: string) => void
   onOk: () => void
 }) {
+  const disc = useRef<HTMLDivElement>(null)
   const [tip, setTip] = useState<{ x: number; y: number } | null>(null)
+
+  /**
+   * The lean is written straight onto the element as custom properties
+   * rather than held in state. A pointer move fires many times a second,
+   * and re-rendering five buttons for each one to move a disc two degrees
+   * would be a poor trade; the transform reads the properties, so React
+   * never has to touch it.
+   */
+  const lean = (x: number, y: number) => {
+    const el = disc.current
+    if (!el || prefersReducedMotion()) return
+    el.style.setProperty('--lean-x', String(x))
+    el.style.setProperty('--lean-y', String(y))
+  }
+
+  // While an arrow is held the press tilt takes over completely, so the two
+  // never add up into something steeper than a press.
+  const pressX = tip ? tip.x * DIAL_TILT : 0
+  const pressY = tip ? tip.y * DIAL_TILT : 0
+  const leanScale = tip ? 0 : DIAL_LEAN
 
   return (
     <div
+      ref={disc}
       className="relative mx-auto rounded-full bg-surface"
+      onPointerMove={(event) => {
+        if (event.pointerType !== 'mouse') return
+        const point = readPoint(event)
+        lean(point.offsetX, point.offsetY)
+      }}
+      onPointerLeave={() => lean(0, 0)}
       style={{
         width: '300em',
         height: '300em',
         boxShadow: tip ? SHADOW.subtle : SHADOW.dial,
         opacity: standby ? 0.55 : 1,
-        transform: tip
-          ? `perspective(900px) rotateY(${DIAL_TILT * tip.x}deg) rotateX(${-DIAL_TILT * tip.y}deg)`
-          : 'none',
+        transform: `perspective(900px) rotateY(calc((${pressX} + var(--lean-x, 0) * ${leanScale}) * 1deg)) rotateX(calc((${-pressY} + var(--lean-y, 0) * ${-leanScale}) * 1deg))`,
         // Held for 90ms, released over 220ms — the disc settles back slower
-        // than it tips, which is what makes it feel weighted.
+        // than it tips, which is what makes it feel weighted. A lean follows
+        // the pointer more loosely still.
         transition: tip
           ? `transform ${PRESS_MS}ms ${EASE_OUT_QUAD}, box-shadow ${PRESS_MS}ms ${EASE_OUT_QUAD}, opacity 240ms ease-out`
-          : `transform 220ms ${EASE_OUT_QUAD}, box-shadow 220ms ${EASE_OUT_QUAD}, opacity 240ms ease-out`,
+          : `transform 320ms ${EASE_OUT_QUAD}, box-shadow 220ms ${EASE_OUT_QUAD}, opacity 240ms ease-out`,
       }}
     >
       {(Object.keys(ARROW_VECTOR) as Direction[]).map((direction) => (

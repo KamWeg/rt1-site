@@ -253,6 +253,24 @@ body {
   transform: scaleX(1);
 }
 
+/* The privacy panel switches on rather than scrolling into place: it waits
+   as a single hairline, then opens vertically to full height, the way a
+   picture tube used to come up. It is the page's only dark block and the
+   only place the argument is about a screen, so it is the only place this
+   belongs.
+
+   Armed it is clipped to a 2px band; unclipped is the resting state, so
+   with no JavaScript the panel is simply there. */
+[data-reveal].crt.reveal-armed {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(calc(50% - 1px) 0 calc(50% - 1px) 0);
+  transition: clip-path 820ms var(--ease-out-expo);
+}
+[data-reveal].crt.reveal-in {
+  clip-path: inset(0 0 0 0);
+}
+
 /* Ticks in the feature table draw themselves on, one row after another,
    rather than being present the moment the table arrives. `pathLength=1`
    on the path is what lets a single dash length cover any stroke. */
@@ -280,6 +298,10 @@ details[open] .answer {
   [data-reveal].draw-x,
   [data-reveal].draw-x.reveal-armed {
     transform: none !important;
+    transition: none !important;
+  }
+  [data-reveal].crt.reveal-armed {
+    clip-path: none !important;
     transition: none !important;
   }
   .check path {
