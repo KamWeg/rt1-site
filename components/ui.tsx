@@ -29,9 +29,18 @@ export function Section({
   return (
     <section
       id={id}
-      className={`py-section ${hairline ? 'border-t border-border' : ''} ${className}`}
+      className={`relative py-section ${className}`}
       style={{ scrollMarginTop: '5rem' }}
     >
+      {/* The divider is an element rather than a border so it can draw
+          itself across the page as the section arrives. */}
+      {hairline ? (
+        <span
+          data-reveal
+          className="draw-x absolute inset-x-0 top-0 block h-px bg-border"
+          aria-hidden="true"
+        />
+      ) : null}
       {children}
     </section>
   )

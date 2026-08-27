@@ -133,7 +133,13 @@ function readPoint(event: React.PointerEvent<HTMLElement>) {
 
 type Press = { label: string; sticky?: boolean }
 
+/** How long after load the self test starts — the hero has settled by then. */
+const BOOT_DELAY_MS = 900
+/** Gap between one key lighting and the next. */
+const BOOT_STEP_MS = 48
+
 export function Remote({ idleLabel }: { idleLabel: string }) {
+  const panel = useRef<HTMLDivElement>(null)
   const [readout, setReadout] = useState<string | null>(null)
   const [volume, setVolume] = useState(14)
   const [channel, setChannel] = useState(5)
@@ -143,6 +149,35 @@ export function Remote({ idleLabel }: { idleLabel: string }) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
+
+  /**
+   * Self test on load: every key lights in turn, top to bottom, the way a
+   * piece of hardware proves itself before it hands over control. It reuses
+   * the press ripple rather than inventing a second kind of glow, so what
+   * the page shows you is exactly what your own press will do.
+   */
+  useEffect(() => {
+    const root = panel.current
+    if (!root || prefersReducedMotion()) return
+
+    const keys = Array.from(root.querySelectorAll<HTMLElement>('[data-tone]'))
+    const timers = keys.map((key, i) =>
+      setTimeout(() => {
+        const { width, height } = key.getBoundingClientRect()
+        spawnRipple(key, width / 2, height / 2, key.dataset.tone === 'light' ? 'light' : 'dark')
+      }, BOOT_DELAY_MS + i * BOOT_STEP_MS),
+    )
+
+    const done = setTimeout(() => {
+      setReadout('Ready')
+      timer.current = setTimeout(() => setReadout(null), READOUT_MS)
+    }, BOOT_DELAY_MS + keys.length * BOOT_STEP_MS)
+
+    return () => {
+      for (const t of timers) clearTimeout(t)
+      clearTimeout(done)
+    }
+  }, [])
 
   const announce = useCallback(({ label, sticky }: Press) => {
     if (timer.current) clearTimeout(timer.current)
@@ -169,6 +204,7 @@ export function Remote({ idleLabel }: { idleLabel: string }) {
   return (
     <div className="w-full" style={{ containerType: 'inline-size' }}>
       <div
+        ref={panel}
         className="mx-auto"
         style={{
           // Three caps, smallest wins: the per-instance ceiling (set by
@@ -395,6 +431,7 @@ function Key({
     <button
       type="button"
       aria-label={label}
+      data-tone={RIPPLE_TONE[variant]}
       onClick={onPress}
       onPointerDown={(event) => {
         const point = readPoint(event)
@@ -539,6 +576,7 @@ function DialKey({
     <button
       type="button"
       aria-label={name}
+      data-tone="dark"
       onClick={onPress}
       onPointerDown={(event) => {
         const point = readPoint(event)
@@ -612,6 +650,7 @@ function Rocker({
         ref={pill}
         role="group"
         aria-label={label}
+        data-tone="dark"
         className="relative flex flex-col items-center justify-between overflow-hidden bg-surface"
         style={{
           width: '76em',

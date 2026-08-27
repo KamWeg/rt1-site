@@ -236,6 +236,59 @@ body {
   }
 }
 
+/* ── Bolder motion ────────────────────────────────────────────────────── */
+
+/* A hairline that draws itself across the page instead of appearing. It
+   opts out of the standard reveal's fade and rise — a rule that faded in
+   while sliding would read as a box, not a line being drawn. */
+[data-reveal].draw-x {
+  transform-origin: left center;
+}
+[data-reveal].draw-x.reveal-armed {
+  opacity: 1;
+  transform: scaleX(0);
+  transition: transform 1000ms var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+[data-reveal].draw-x.reveal-in {
+  transform: scaleX(1);
+}
+
+/* Ticks in the feature table draw themselves on, one row after another,
+   rather than being present the moment the table arrives. `pathLength=1`
+   on the path is what lets a single dash length cover any stroke. */
+.check path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 520ms var(--ease-out-expo) var(--check-delay, 0ms);
+}
+[data-reveal].reveal-armed:not(.reveal-in) .check path {
+  stroke-dashoffset: 1;
+}
+
+/* An answer unfolds rather than appearing. Only the opening is animated:
+   a closing <details> removes its content immediately, and fighting that
+   costs more machinery than the half-second is worth. */
+@keyframes unfold {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+details[open] .answer {
+  animation: unfold 420ms var(--ease-out-expo) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal].draw-x,
+  [data-reveal].draw-x.reveal-armed {
+    transform: none !important;
+    transition: none !important;
+  }
+  .check path {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+  details[open] .answer { animation: none !important; }
+}
+
 /* ── Keys ─────────────────────────────────────────────────────────────── */
 
 /* Press feedback lives in components/Remote.tsx, because it needs the touch

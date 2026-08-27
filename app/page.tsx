@@ -247,8 +247,12 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {features.rows.map((row) => (
-                    <tr key={row.name} className="border-b border-border">
+                  {features.rows.map((row, i) => (
+                    <tr
+                      key={row.name}
+                      className="border-b border-border"
+                      style={{ '--check-delay': `${i * 55}ms` } as React.CSSProperties}
+                    >
                       <th
                         scope="row"
                         className="py-5 pr-4 text-[0.9375rem] font-normal leading-snug text-ink"
@@ -288,7 +292,7 @@ export default function Home() {
                         <Triangle width={10} height={7} direction="right" className="fill-muted" />
                       </span>
                     </summary>
-                    <p className="measure pb-8 text-[0.9375rem] leading-relaxed text-muted">{item.a}</p>
+                    <p className="answer measure pb-8 text-[0.9375rem] leading-relaxed text-muted">{item.a}</p>
                   </details>
                 ))}
               </div>
@@ -326,9 +330,16 @@ function Availability({ included }: { included: boolean }) {
         viewBox="0 0 14 11"
         aria-hidden="true"
         focusable="false"
-        className="ml-auto block stroke-ink"
+        className="check ml-auto block stroke-ink"
       >
-        <path d="M1 5.6 5 9.5 13 1.5" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path
+          d="M1 5.6 5 9.5 13 1.5"
+          pathLength={1}
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
       </svg>
     </>
   )
