@@ -147,12 +147,44 @@ export function SplitLines({
     if (!revealed) observer.observe(host)
 
     /**
-     * A deadline, because the cost of this animation failing is a heading
-     * that never appears. Observers can be starved — a background tab stops
-     * delivering them entirely — and no animation is worth losing the words
-     * over. Whatever happens, the heading is readable within four seconds.
+     * The same fallback Reveal carries, and for the same reason: an observer
+     * can be starved, and a hidden heading with nothing to un-hide it is a
+     * heading that is simply gone.
+     *
+     * Driven by position rather than by a clock. A deadline would fire while
+     * the reader was still somewhere above, revealing the heading before
+     * they ever reached it — which is how a safety net ends up deleting the
+     * thing it was protecting.
      */
-    const failsafe = setTimeout(reveal, 4000)
+    // Throttled on a timestamp rather than a frame. The fallback exists for
+    // the case where the browser is not servicing this page normally, and
+    // requestAnimationFrame is the first thing to stop in that state — a
+    // safety net must not be built out of the thing it is catching.
+    let last = 0
+
+    const sweep = () => {
+      last = Date.now()
+      if (revealed) return detach()
+      if (host.getBoundingClientRect().top < window.innerHeight * 0.9) {
+        reveal()
+        detach()
+      }
+    }
+
+    const schedule = () => {
+      if (Date.now() - last < 80) return
+      sweep()
+    }
+
+    function detach() {
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      document.removeEventListener('visibilitychange', sweep)
+    }
+
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    document.addEventListener('visibilitychange', sweep)
 
     // Line breaks move when the column does, so the split is redone on a
     // width change — and only on a width change, since a height change
@@ -168,7 +200,7 @@ export function SplitLines({
     resize.observe(host)
 
     return () => {
-      clearTimeout(failsafe)
+      detach()
       observer.disconnect()
       resize.disconnect()
       host.textContent = text
