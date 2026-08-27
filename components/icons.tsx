@@ -10,6 +10,19 @@
 type Direction = 'up' | 'down' | 'left' | 'right'
 type Point = { x: number; y: number }
 
+/**
+ * Sizes are given as plain numbers meaning design pixels, and rendered in
+ * whichever unit the call site asks for.
+ *
+ * The remote scales itself by setting a font-size below 1px and expressing
+ * every dimension in `em`; an icon drawn at a fixed pixel size would stay
+ * put while the key around it shrank. So inside the remote the icons take
+ * `unit="em"` and shrink with everything else. Everywhere else on the page
+ * the surrounding font-size is a normal 16px, where `em` would be wildly
+ * wrong, so the default stays `px`.
+ */
+export type SizeUnit = 'px' | 'em'
+
 /** Figma's radius steps, keyed by the arrow's width. */
 function radiusForWidth(width: number): number {
   if (width >= 12) return 1
@@ -60,11 +73,13 @@ export function Triangle({
   height,
   direction = 'up',
   className = 'fill-glyph',
+  unit = 'px',
 }: {
   width: number
   height: number
   direction?: Direction
   className?: string
+  unit?: SizeUnit
 }) {
   const r = radiusForWidth(width)
   const sideways = direction === 'left' || direction === 'right'
@@ -97,12 +112,11 @@ export function Triangle({
 
   return (
     <svg
-      width={boxW}
-      height={boxH}
       viewBox={`0 0 ${boxW} ${boxH}`}
       aria-hidden="true"
       focusable="false"
       className={className}
+      style={{ width: `${boxW}${unit}`, height: `${boxH}${unit}`, flexShrink: 0 }}
     >
       <path d={roundedPolygonPath(points[direction], r)} />
     </svg>
@@ -118,7 +132,11 @@ export function Triangle({
  * because the bar adds mass at the top; here the box is extended downwards
  * to exactly twice the arc centre, so centring the box centres the ring.
  */
-export function PowerIcon({ size = 24, className = 'text-white' }: { size?: number; className?: string }) {
+export function PowerIcon({
+  size = 24,
+  className = 'text-white',
+  unit = 'px',
+}: { size?: number; className?: string; unit?: SizeUnit }) {
   const BOX_W = 24
   const CX = 12
   const CY = 14.28
@@ -131,12 +149,11 @@ export function PowerIcon({ size = 24, className = 'text-white' }: { size?: numb
 
   return (
     <svg
-      width={size}
-      height={(size * BOX_H) / BOX_W}
       viewBox={`0 0 ${BOX_W} ${BOX_H}`}
       aria-hidden="true"
       focusable="false"
       className={className}
+      style={{ width: `${size}${unit}`, height: `${(size * BOX_H) / BOX_W}${unit}`, flexShrink: 0 }}
     >
       <path
         d={`M${CX + dx} ${CY - dy} A${RADIUS} ${RADIUS} 0 1 1 ${CX - dx} ${CY - dy}`}
@@ -152,37 +169,76 @@ export function PowerIcon({ size = 24, className = 'text-white' }: { size?: numb
 
 const BAR = 2
 
-export function PlusIcon({ size = 12, className = 'fill-glyph' }: { size?: number; className?: string }) {
+export function PlusIcon({
+  size = 12,
+  className = 'fill-glyph',
+  unit = 'px',
+}: { size?: number; className?: string; unit?: SizeUnit }) {
   const offset = (size - BAR) / 2
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true" focusable="false" className={className}>
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+      style={{ width: `${size}${unit}`, height: `${size}${unit}`, flexShrink: 0 }}
+    >
       <rect x={0} y={offset} width={size} height={BAR} rx={1} />
       <rect x={offset} y={0} width={BAR} height={size} rx={1} />
     </svg>
   )
 }
 
-export function MinusIcon({ size = 12, className = 'fill-glyph' }: { size?: number; className?: string }) {
+export function MinusIcon({
+  size = 12,
+  className = 'fill-glyph',
+  unit = 'px',
+}: { size?: number; className?: string; unit?: SizeUnit }) {
   return (
-    <svg width={size} height={BAR} viewBox={`0 0 ${size} ${BAR}`} aria-hidden="true" focusable="false" className={className}>
+    <svg
+      viewBox={`0 0 ${size} ${BAR}`}
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+      style={{ width: `${size}${unit}`, height: `${BAR}${unit}`, flexShrink: 0 }}
+    >
       <rect x={0} y={0} width={size} height={BAR} rx={1} />
     </svg>
   )
 }
 
 /** Home key — a rounded square outline, 2px stroke. */
-export function StopIcon({ size = 14, className = 'stroke-glyph' }: { size?: number; className?: string }) {
+export function StopIcon({
+  size = 14,
+  className = 'stroke-glyph',
+  unit = 'px',
+}: { size?: number; className?: string; unit?: SizeUnit }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 14 14" aria-hidden="true" focusable="false" className={className}>
+    <svg
+      viewBox="0 0 14 14"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+      style={{ width: `${size}${unit}`, height: `${size}${unit}`, flexShrink: 0 }}
+    >
       <rect x={1} y={1} width={12} height={12} rx={2.5} strokeWidth={2} fill="none" />
     </svg>
   )
 }
 
 /** Menu key — three 14×2 bars, 4px apart. */
-export function MenuIcon({ className = 'fill-glyph' }: { className?: string }) {
+export function MenuIcon({
+  className = 'fill-glyph',
+  unit = 'px',
+}: { className?: string; unit?: SizeUnit }) {
   return (
-    <svg width={14} height={10} viewBox="0 0 14 10" aria-hidden="true" focusable="false" className={className}>
+    <svg
+      viewBox="0 0 14 10"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+      style={{ width: `14${unit}`, height: `10${unit}`, flexShrink: 0 }}
+    >
       <rect x={0} y={0} width={14} height={BAR} rx={1} />
       <rect x={0} y={4} width={14} height={BAR} rx={1} />
       <rect x={0} y={8} width={14} height={BAR} rx={1} />

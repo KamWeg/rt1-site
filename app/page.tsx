@@ -23,10 +23,14 @@ export default function Home() {
       <Nav />
 
       <main id="main">
-        {/* ── Hero ───────────────────────────────────────────────────── */}
-        <Section hairline={false} className="pt-16 sm:pt-24">
+        {/* ── Hero ─────────────────────────────────────────────────────
+            On a wide screen this is deliberately one screenful: the section
+            takes the viewport less the nav, centres its contents, and the
+            remote scales itself down to whatever height is left (see
+            `.remote-fit`). Below that it simply stacks and scrolls. */}
+        <section className="px-0 pb-20 pt-10 sm:pb-28 sm:pt-14 lg:flex lg:min-h-[calc(100svh-4rem)] lg:items-center lg:py-8">
           <Container>
-            <div className="grid items-center gap-16 lg:grid-cols-[1fr_minmax(320px,420px)] lg:gap-20">
+            <div className="grid items-center gap-14 lg:grid-cols-[1fr_minmax(280px,360px)] lg:gap-16">
               <div data-reveal>
                 <p className="micro-s text-muted">{hero.eyebrow}</p>
 
@@ -44,9 +48,9 @@ export default function Home() {
                   {site.tagline}
                 </p>
 
-                <p className="measure text-lead mt-8 leading-[1.55] text-muted">{hero.lede}</p>
+                <p className="measure text-lead mt-7 leading-[1.55] text-muted">{hero.lede}</p>
 
-                <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
                   {/* Not a link: the app is not on the store yet, and a button
                       that goes nowhere is worse than one that says so. */}
                   <span className="micro-l inline-flex items-center gap-3 rounded-full bg-dark px-6 py-4 text-on-dark">
@@ -58,15 +62,15 @@ export default function Home() {
                   </Link>
                 </div>
 
-                <p className="micro-s mt-6 text-muted">{hero.status.note}</p>
+                <p className="micro-s mt-5 text-muted">{hero.status.note}</p>
               </div>
 
-              <div data-reveal className="lg:pl-4">
+              <div data-reveal className="remote-fit lg:pl-4">
                 <Remote idleLabel={hero.idle} />
               </div>
             </div>
           </Container>
-        </Section>
+        </section>
 
         {/* ── /01 How it works ───────────────────────────────────────── */}
         <Section id="how-it-works">

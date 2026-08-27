@@ -147,22 +147,18 @@ body {
 
 /* ── Keys ─────────────────────────────────────────────────────────────── */
 
-/* Hover deepens the shadow, press drops it. Nothing scales — a control that
-   grows under the cursor stops reading as a physical key. */
-.key:hover { box-shadow: 0 3px 9px rgba(0, 0, 0, 0.12) !important; }
-.key:active { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important; }
+/* Press feedback lives in components/Remote.tsx, because it needs the touch
+   point. What belongs here is how large the remote may draw itself.
 
-/* Keys that sit on an existing surface (dial arrows, rocker halves) have no
-   shadow of their own; they acknowledge a press by tinting the surface. */
-.key-flat {
-  background: transparent;
-  transition: background-color 150ms ease-out;
-}
-.key-flat:hover { background: rgba(28, 28, 26, 0.04); }
-.key-flat:active { background: rgba(28, 28, 26, 0.08); }
+   On a wide screen it is sized to fill four fifths of the viewport height:
+   825 is the remote's own height in em, so dividing 80svh by it gives the
+   em size that lands exactly there. The 1px ceiling stops it from ever
+   rendering larger than it was drawn, which would leave the shadows and
+   hairlines out of proportion with the design. */
+.remote-fit { --remote-cap: 1px; }
 
-@media (prefers-reduced-motion: reduce) {
-  .key, .key-flat { transition: none !important; }
+@media (min-width: 1024px) {
+  .remote-fit { --remote-cap: min(1px, calc(80svh / 825)); }
 }
 
 /* ── Interactive text ─────────────────────────────────────────────────── */
